@@ -9,46 +9,28 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 
-import { counterIncrement, counterDecrement } from './actions';
+import { counterIncrement, counterDecrement, counterClear, counterSet, helloAction } from './actions';
 
 class Main extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            count: 0
-        };
-        this.onPressIncrement = this.onPressIncrement.bind(this);
-        this.onPressDecrement = this.onPressDecrement.bind(this);
-        this.onPressClear = this.onPressClear.bind(this);
         this.onChangeText = this.onChangeText.bind(this);
     }
 
-    onPressIncrement = () => {
-        this.setState({ count: this.state.count + 1 });
-    }
-
-    onPressDecrement = () => {
-        this.setState({ count: this.state.count - 1 });
-    }
-
-    onPressClear = () => {
-        this.setState({ count: 0 });
-    }
-
     onChangeText = (number) => {
-        const count = parseInt(number, 10);
-        this.setState({ count });
+        this.props.counterSet(parseInt(number, 10));
     }
 
     render = () => {
         console.log(this.props);
         const { container, countViewStyle, welcome } = styles;
+        const { helloText, pressedButton } = this.props.hello;
         return (
             <View style={container}>
                 <TextInput
                     style={{ width: 100, height: 40, borderWidth: 5, margin: 2 }}
                     onChangeText={this.onChangeText}
-                    value={this.state.count.toString()}
+                    value={this.props.count.toString()}
                     textAlign={'center'}
                 />
                 <View style={countViewStyle}>
@@ -56,7 +38,10 @@ class Main extends Component {
                     <Text style={welcome}>{this.props.count}</Text>
                     <Button onPress={this.props.counterDecrement} title="-" />
                 </View>
-                <Button onPress={this.onPressClear} title="Clear" />
+                <Button onPress={this.props.counterClear} title="Clear" />
+                <Text>{helloText}</Text>
+                <Text>Button was pressed => {pressedButton.toString()}</Text>
+                <Button onPress={this.props.helloAction} title="Show me the magic" />
             </View>
             );
     }
@@ -79,6 +64,16 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state) => ({ count: state });
+const mapStateToProps = (state) => ({ 
+    count: state.counter,
+    hello: state.hello
+});
 
-export default connect(mapStateToProps, { counterIncrement, counterDecrement })(Main);
+export default connect(mapStateToProps, 
+    { 
+        counterIncrement, 
+        counterDecrement, 
+        counterClear, 
+        counterSet,
+        helloAction
+    })(Main);
